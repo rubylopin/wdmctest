@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作管理系統 📋</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 自訂樣式 -->
+    <link rel="stylesheet" href="public/css/common.css">
+    <link rel="stylesheet" href="public/css/blue-theme.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>📋 工作管理系統</h1>
+                <div class="btn-group">
+                    <a href="masters.html" class="btn btn-outline-primary">⚙️ 主檔管理</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 控制列 -->
+    <div class="container-fluid">
+        <div class="control-bar">
+            <div class="date-controls">
+                <button class="btn btn-primary" id="prevPeriod">◀ 上一期</button>
+                <button class="btn btn-success" id="today">📅 今天</button>
+                <button class="btn btn-primary" id="nextPeriod">下一期 ▶</button>
+                <span class="current-date" id="currentDate">載入中...</span>
+            </div>
+
+            <div class="view-switcher">
+                <button class="btn btn-info active" id="weekViewBtn">週視圖</button>
+                <button class="btn btn-outline-info" id="monthViewBtn">月視圖</button>
+            </div>
+
+            <div>
+                <button class="btn btn-success" id="addTaskBtn">➕ 新增任務</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 任務視圖區 -->
+    <div class="container-fluid">
+        <div id="taskViewArea">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">載入中...</span>
+                </div>
+                <p class="mt-3">載入中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/編輯任務 Modal -->
+    <div class="modal fade" id="taskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalLabel">新增任務</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm">
+                        <input type="hidden" id="taskId">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fill_date" class="form-label">填寫日期 *</label>
+                                <input type="date" class="form-control" id="fill_date" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="expected_complete_date" class="form-label">預計完成日期</label>
+                                <input type="date" class="form-control" id="expected_complete_date">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="company_id" class="form-label">公司別</label>
+                                <select class="form-select" id="company_id">
+                                    <option value="">（無）</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="work_item_id" class="form-label">工作項目 *</label>
+                                <select class="form-select" id="work_item_id" required>
+                                    <option value="">請選擇...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">工作說明</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">完成狀態</label>
+                            <select class="form-select" id="status">
+                                <option value="pending">⏳ 待處理</option>
+                                <option value="in_progress">🔄 進行中</option>
+                                <option value="completed">✅ 已完成</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="deleteTaskBtn" style="display: none;">刪除</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskBtn">儲存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 共用 JS -->
+    <script src="public/js/common.js"></script>
+    <script src="public/js/weekView.js"></script>
+    <script src="public/js/monthView.js"></script>
+    <script src="public/js/taskModal.js"></script>
+
+    <!-- 主程式 -->
+    <script>
+        // 全域變數
+        let currentView = 'week'; // 'week' or 'month'
+        let currentDate = new Date();
+        let weekView = null;
+        let monthView = null;
+        let taskModal = null;
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 初始化視圖
+            weekView = new WeekView();
+            monthView = new MonthView();
+            taskModal = new TaskModal();
+
+            // 載入初始資料
+            await taskModal.loadMasterData();
+
+            // 顯示週視圖
+            await switchView('week');
+
+            // 設定事件監聽
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // 視圖切換
+            document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
+            document.getElementById('monthViewBtn').addEventListener('click', () => switchView('month'));
+
+            // 日期控制
+            document.getElementById('prevPeriod').addEventListener('click', () => changePeriod(-1));
+            document.getElementById('today').addEventListener('click', () => goToToday());
+            document.getElementById('nextPeriod').addEventListener('click', () => changePeriod(1));
+
+            // 新增任務
+            document.getElementById('addTaskBtn').addEventListener('click', () => {
+                taskModal.openModal(null, DateHelper.formatDate(currentDate));
+            });
+        }
+
+        async function switchView(view) {
+            currentView = view;
+
+            // 更新按鈕樣式
+            document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+            document.getElementById('weekViewBtn').classList.toggle('btn-info', view === 'week');
+            document.getElementById('weekViewBtn').classList.toggle('btn-outline-info', view !== 'week');
+
+            document.getElementById('monthViewBtn').classList.toggle('active', view === 'month');
+            document.getElementById('monthViewBtn').classList.toggle('btn-info', view === 'month');
+            document.getElementById('monthViewBtn').classList.toggle('btn-outline-info', view !== 'month');
+
+            // 顯示對應視圖
+            if (view === 'week') {
+                await weekView.render(currentDate);
+                updateDateDisplay();
+            } else {
+                await monthView.render(currentDate.getFullYear(), currentDate.getMonth() + 1);
+                updateDateDisplay();
+            }
+        }
+
+        function changePeriod(offset) {
+            if (currentView === 'week') {
+                currentDate = DateHelper.addWeeks(currentDate, offset);
+            } else {
+                currentDate = DateHelper.addMonths(currentDate, offset);
+            }
+            switchView(currentView);
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            switchView(currentView);
+        }
+
+        function updateDateDisplay() {
+            const dateElement = document.getElementById('currentDate');
+            if (currentView === 'week') {
+                const range = DateHelper.getWeekRange(currentDate);
+                dateElement.textContent = range.display;
+            } else {
+                dateElement.textContent = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月`;
+            }
+        }
+
+        // 重新載入當前視圖
+        async function reloadCurrentView() {
+            await switchView(currentView);
+        }
+    </script>
+</body>
+</html>
